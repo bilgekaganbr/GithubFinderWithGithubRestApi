@@ -18,17 +18,29 @@ def index():
         githubname = request.form.get("githubname")
 
         # Send a GET request to the GitHub API for user information
-        response = requests.get(base_url + githubname)
+        response_user = requests.get(base_url + githubname)
+        # Retrieve the JSON response for user information
+        user_info = response_user.json()
 
-        # Retrieve the JSON response
-        user_info = response.json()
+        # Send a GET request to the GitHub API for repository information
+        response_repos = requests.get(base_url + githubname + "/repos")
+        # Retrieve the JSON response for repository information
+        repos_info = response_repos.json()
 
-        # Render the template and pass the user_info to be displayed
-        return render_template("index.html", profile = user_info)
+        # Check if the user is not found
+        if "message" in user_info:
+            
+            # Render the template "index.html" with an error message
+            return render_template("index.html", error = "User Not Found.")
+        
+        else:
+
+            # Render the template "index.html" and pass the user_info and the repos_info to be displayed
+            return render_template("index.html", profile = user_info, repos = repos_info)
 
     else:
 
-        # If the request is GET, render the template without any user information
+        # If the request is GET, render the template "index.html" without any user information
         return render_template("index.html")
 
 if __name__ == "__main__":
